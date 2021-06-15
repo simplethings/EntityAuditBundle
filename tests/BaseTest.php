@@ -178,6 +178,8 @@ abstract class BaseTest extends TestCase
         }
 
         $auditConfig = AuditConfiguration::forEntities($this->auditedEntities);
+        $auditConfig->setConvertEnumToString(true);
+        $auditConfig->setDatabasePlatform($this->getEntityManager()->getConnection()->getDatabasePlatform());
         $auditConfig->setGlobalIgnoreColumns(['ignoreme']);
         $auditConfig->setUsernameCallable(static function () {
             return 'beberlei';

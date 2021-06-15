@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace SimpleThings\EntityAudit;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use SimpleThings\EntityAudit\Exception\ConfigurationNotSetException;
 
 class AuditConfiguration
 {
@@ -26,6 +28,11 @@ class AuditConfiguration
     private $revisionTypeFieldName = 'revtype';
     private $revisionIdFieldType = 'integer';
     private $usernameCallable;
+    private $convertEnumToString = false;
+    /**
+     * @var null|AbstractPlatform
+     */
+    private $databasePlatform = null;
 
     /**
      * @return AuditConfiguration
@@ -53,71 +60,113 @@ class AuditConfiguration
         return $this->getTablePrefix().$tableName.$this->getTableSuffix();
     }
 
+    /**
+     * @return string
+     */
     public function getTablePrefix()
     {
         return $this->tablePrefix;
     }
 
+    /**
+     * @param string $prefix
+     */
     public function setTablePrefix($prefix): void
     {
         $this->tablePrefix = $prefix;
     }
 
+    /**
+     * @return string
+     */
     public function getTableSuffix()
     {
         return $this->tableSuffix;
     }
 
+    /**
+     * @param string $suffix
+     */
     public function setTableSuffix($suffix): void
     {
         $this->tableSuffix = $suffix;
     }
 
+    /**
+     * @return string
+     */
     public function getRevisionFieldName()
     {
         return $this->revisionFieldName;
     }
 
+    /**
+     * @param string $revisionFieldName
+     */
     public function setRevisionFieldName($revisionFieldName): void
     {
         $this->revisionFieldName = $revisionFieldName;
     }
 
+    /**
+     * @return string
+     */
     public function getRevisionTypeFieldName()
     {
         return $this->revisionTypeFieldName;
     }
 
+    /**
+     * @param string $revisionTypeFieldName
+     */
     public function setRevisionTypeFieldName($revisionTypeFieldName): void
     {
         $this->revisionTypeFieldName = $revisionTypeFieldName;
     }
 
+    /**
+     * @return string
+     */
     public function getRevisionTableName()
     {
         return $this->revisionTableName;
     }
 
+    /**
+     * @param string $revisionTableName
+     */
     public function setRevisionTableName($revisionTableName): void
     {
         $this->revisionTableName = $revisionTableName;
     }
 
+    /**
+     * @param string[] $classes
+     */
     public function setAuditedEntityClasses(array $classes): void
     {
         $this->auditedEntityClasses = $classes;
     }
 
+    /**
+     * @return string[]
+     */
     public function getGlobalIgnoreColumns()
     {
         return $this->globalIgnoreColumns;
     }
 
+    /**
+     * @param string[] $columns
+     */
     public function setGlobalIgnoreColumns(array $columns): void
     {
         $this->globalIgnoreColumns = $columns;
     }
 
+    /**
+     * @return Metadata\MetadataFactory
+     */
     public function createMetadataFactory()
     {
         return new Metadata\MetadataFactory($this->auditedEntityClasses);
@@ -145,6 +194,9 @@ class AuditConfiguration
         return (string) ($callable ? $callable() : '');
     }
 
+    /**
+     * @param callable|null $usernameCallable
+     */
     public function setUsernameCallable($usernameCallable): void
     {
         // php 5.3 compat
@@ -163,13 +215,49 @@ class AuditConfiguration
         return $this->usernameCallable;
     }
 
+    /**
+     * @param string $revisionIdFieldType
+     */
     public function setRevisionIdFieldType($revisionIdFieldType): void
     {
         $this->revisionIdFieldType = $revisionIdFieldType;
     }
 
+    /**
+     * @return string
+     */
     public function getRevisionIdFieldType()
     {
         return $this->revisionIdFieldType;
+    }
+
+    public function setConvertEnumToString(bool $convertEnum): void
+    {
+        $this->convertEnumToString = $convertEnum;
+    }
+
+    public function getConvertEnumToString(): bool
+    {
+        return $this->convertEnumToString;
+    }
+
+    /**
+     * @return null|AbstractPlatform
+     */
+    public function getDatabasePlatform()
+    {
+        if($this->getConvertEnumToString() === true && $this->databasePlatform === null){
+            throw new ConfigurationNotSetException('databasePlatform');
+        }
+
+        return $this->databasePlatform;
+    }
+
+    /**
+     * @param null|AbstractPlatform $databasePlatform
+     */
+    public function setDatabasePlatform($databasePlatform): void
+    {
+        $this->databasePlatform = $databasePlatform;
     }
 }
