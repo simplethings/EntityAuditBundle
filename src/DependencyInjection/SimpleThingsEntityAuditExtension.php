@@ -39,6 +39,7 @@ class SimpleThingsEntityAuditExtension extends Extension
             'revision_table_name',
             'revision_id_field_type',
             'global_ignore_columns',
+            'entity_ignored_properties',
         ];
 
         foreach ($configurables as $key) {

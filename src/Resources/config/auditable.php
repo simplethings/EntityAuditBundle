@@ -69,6 +69,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             ->public()
             ->call('setAuditedEntityClasses', ['%simplethings.entityaudit.audited_entities%'])
             ->call('setGlobalIgnoreColumns', ['%simplethings.entityaudit.global_ignore_columns%'])
+            ->call('setEntityIgnoredProperties', ['%simplethings.entityaudit.entity_ignored_properties%'])
             ->call('setTablePrefix', ['%simplethings.entityaudit.table_prefix%'])
             ->call('setTableSuffix', ['%simplethings.entityaudit.table_suffix%'])
             ->call('setRevisionTableName', ['%simplethings.entityaudit.revision_table_name%'])
